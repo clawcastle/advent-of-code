@@ -18,13 +18,10 @@ fn get_sums() -> Box<dyn Iterator<Item = i64>> {
     let input = include_str!("input.txt");
 
     Box::new(input.split("\n\n").map(|elf| {
-        let sum = elf.lines().fold(0, |curr_sum, line| {
-            if let Ok(n) = line.parse::<i64>() {
-                return curr_sum + n;
-            }
-
-            curr_sum
-        });
+        let sum: i64 = elf
+            .lines()
+            .filter_map(|line| line.parse::<i64>().ok())
+            .sum();
 
         sum
     }))
