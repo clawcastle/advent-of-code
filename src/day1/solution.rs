@@ -5,13 +5,7 @@ pub fn part1() -> i64 {
 }
 
 pub fn part2() -> i64 {
-    get_sums()
-        .sorted()
-        .rev()
-        .next_chunk::<3>()
-        .unwrap()
-        .into_iter()
-        .sum()
+    get_sums().sorted().rev().take(3).sum()
 }
 
 fn get_sums() -> Box<dyn Iterator<Item = i64>> {
