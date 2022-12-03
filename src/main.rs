@@ -3,9 +3,7 @@
 
 mod day1;
 mod day2;
-
+mod day3;
 fn main() {
-    let x = crate::day2::solution::part2();
-
-    println!("{x}");
+    crate::day3::solution::part1()
 }
