@@ -13,6 +13,20 @@ pub fn part1() {
     println!("{:?}", in_both_compartments);
 }
 
+pub fn part2() {
+    let input = include_str!("input.txt");
+
+    let priority_sum: u64 = input
+        .lines()
+        .map(BackPack::from_str)
+        .tuples()
+        .filter_map(|(b1, b2, b3)| b1.get_item_also_in_other_backpacks(vec![&b2, &b3]))
+        .map(|item| item.priority())
+        .sum();
+
+    println!("{priority_sum}");
+}
+
 #[derive(Debug)]
 pub struct BackPack<T: BackPackItem> {
     compartment_1: Vec<T>,
@@ -49,4 +63,28 @@ impl BackPack<char> {
             .copied()
             .find(|item| self.compartment_2.contains(item))
     }
+
+    pub fn get_item_also_in_other_backpacks(&self, others: Vec<&BackPack<char>>) -> Option<char> {
+        let mut counts: [u8; 256] = [0; 256];
+
+        for backpack in others {
+            for item in backpack
+                .compartment_1
+                .iter()
+                .chain(backpack.compartment_2.iter())
+            {
+                let count_index = *item as usize;
+
+                counts[count_index] += 1;
+
+                if counts[count_index] >= 3 {
+                    return Some(*item);
+                }
+            }
+        }
+
+        None
+    }
 }
+
+pub struct ElfGroup<'a>(Vec<&'a str>);

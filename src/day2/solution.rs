@@ -52,10 +52,8 @@ impl MatchRound {
     pub fn from_input_line_part_1(line: &str) -> Option<Self> {
         let chars = line.chars().collect_vec();
 
-        if let Some(opponent_shape_char) = chars.get(0) && let Some(my_shape_char) = chars.get(2) {
-            if let Some(opponent_shape) = Shape::from_char(*opponent_shape_char) && let Some(my_shape) = Shape::from_char(*my_shape_char) {
-                return Some(MatchRound::new(my_shape, opponent_shape));
-            }
+        if let Some(opponent_shape_char) = chars.get(0) && let Some(my_shape_char) = chars.get(2) && let Some(opponent_shape) = Shape::from_char(*opponent_shape_char) && let Some(my_shape) = Shape::from_char(*my_shape_char) {
+            return Some(MatchRound::new(my_shape, opponent_shape));
         }
 
         None
@@ -64,10 +62,8 @@ impl MatchRound {
     pub fn from_input_line_part_2(line: &str) -> Option<Self> {
         let chars = line.chars().collect_vec();
 
-        if let Some(opponent_shape_char) = chars.get(0) && let Some(my_shape_char) = chars.get(2) {
-            if let Some(opponent_shape) = Shape::from_char(*opponent_shape_char) && let Some(my_shape) = Shape::from_char_and_opponents_shape(*my_shape_char, opponent_shape) {
-                return Some(MatchRound::new(my_shape, opponent_shape));
-            }
+        if let Some(opponent_shape_char) = chars.get(0) && let Some(my_shape_char) = chars.get(2) && let Some(opponent_shape) = Shape::from_char(*opponent_shape_char) && let Some(my_shape) = Shape::from_char_and_opponents_shape(*my_shape_char, opponent_shape) {
+            return Some(MatchRound::new(my_shape, opponent_shape));
         }
 
         None
