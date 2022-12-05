@@ -3,7 +3,7 @@
 mod day5;
 
 fn main() {
-    let result = crate::day5::solution::part1();
+    let result = crate::day5::solution::part2();
 
     println!("{:?}", result);
 }

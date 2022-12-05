@@ -1,6 +1,14 @@
 use itertools::Itertools;
 
 pub fn part1() -> Vec<char> {
+    solve(false)
+}
+
+pub fn part2() -> Vec<char> {
+    solve(true)
+}
+
+pub fn solve(preserve_order: bool) -> Vec<char> {
     let input = include_str!("input.txt");
 
     let (drawing, moves) = input
@@ -16,8 +24,8 @@ pub fn part1() -> Vec<char> {
     let moves = parse_moves(moves);
 
     for mv in moves.iter() {
-        if ship.move_crates(*mv).is_err() {
-            println!("Move: {:?} failed.", mv);
+        if ship.move_crates(*mv, preserve_order).is_err() {
+            panic!("Move failed");
         }
     }
 
@@ -38,8 +46,6 @@ pub fn parse_stacks_from_drawing(drawing: &str) -> Vec<Vec<Crate>> {
         .filter(|s| s.parse::<i64>().is_ok())
         .map(|_| Vec::new())
         .collect_vec();
-
-    println!("{:?}", stacks);
 
     for line in lines_iter {
         for (i, c) in line.chars().enumerate() {
@@ -70,7 +76,7 @@ pub struct Ship {
 }
 
 impl Ship {
-    pub fn move_crates(&mut self, mv: Move) -> Result<u64, ()> {
+    pub fn move_crates(&mut self, mv: Move, preserve_order: bool) -> Result<u64, ()> {
         let mut crates_to_move: Vec<Crate> = Vec::with_capacity(mv.amount as usize);
 
         if let Some(from_stack) = self.crate_stacks.get_mut(mv.from) {
@@ -78,20 +84,22 @@ impl Ship {
                 if let Some(crate_to_move) = from_stack.pop() {
                     crates_to_move.push(crate_to_move);
                 } else {
-                    println!("wut");
                     return Err(());
                 }
-            }
-            for x in self.crate_stacks.clone() {
-                println!("{}", x.len());
             }
         } else {
             return Err(());
         }
 
         if let Some(to_stack) = self.crate_stacks.get_mut(mv.to) {
-            for c in crates_to_move {
-                to_stack.push(c);
+            if preserve_order {
+                for c in crates_to_move.iter().rev() {
+                    to_stack.push(*c);
+                }
+            } else {
+                for c in crates_to_move.iter() {
+                    to_stack.push(*c);
+                }
             }
         }
 
