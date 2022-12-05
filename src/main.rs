@@ -1,12 +1,9 @@
 #![feature(iter_next_chunk)]
 #![feature(let_chains)]
-mod day1;
-mod day2;
-mod day3;
-mod day4;
+mod day5;
 
 fn main() {
-    let result = crate::day4::solution::part2();
+    let result = crate::day5::solution::part1();
 
-    println!("{result}");
+    println!("{:?}", result);
 }
