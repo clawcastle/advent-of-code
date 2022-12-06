@@ -21,7 +21,6 @@ fn first_index_after_n_unique_characters<const N: usize>(input: &str) -> Option<
         .enumerate()
     {
         if window.iter().unique().count() == N {
-            println!("{:?}", window);
             return Some(i + N);
         }
     }
