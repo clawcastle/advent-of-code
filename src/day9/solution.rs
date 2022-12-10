@@ -3,6 +3,14 @@ use std::{collections::HashSet, str::FromStr};
 use itertools::Itertools;
 
 pub fn part1() -> usize {
+    solve_for_rope_length_n::<2>()
+}
+
+pub fn part2() -> usize {
+    solve_for_rope_length_n::<10>()
+}
+
+fn solve_for_rope_length_n<const N: usize>() -> usize {
     let input = include_str!("input.txt");
 
     let moves = input
@@ -10,26 +18,48 @@ pub fn part1() -> usize {
         .filter_map(|line| Move::from_str(line).ok())
         .collect_vec();
 
-    let mut rope = Rope::default();
-
-    let mut end_positions: HashSet<Position> = HashSet::new();
-    end_positions.insert(Position::default());
-
-    for mv in moves {
-        for _ in 1..=mv.steps {
-            rope = rope.process_move(mv.direction);
-
-            end_positions.insert(rope.end);
-        }
-    }
-
-    end_positions.len()
+    moves
+        .iter()
+        .flat_map(|mv| (0..mv.steps).map(|_| mv.direction))
+        .fold(
+            (
+                &mut HashSet::<Position>::new(),
+                Rope {
+                    knots: vec![Position::default(); N],
+                },
+            ),
+            |(positions, rp), dir| {
+                let next_rp = rp.process_move(dir);
+                positions.insert(*rp.knots.last().expect("Expected at least one knot."));
+                (positions, next_rp)
+            },
+        )
+        .0
+        .len()
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Default)]
 struct Rope {
-    start: Position,
-    end: Position,
+    knots: Vec<Position>,
+}
+
+impl Rope {
+    fn process_move(&self, direction: Direction) -> Self {
+        let mut previous_knot: Option<Position> = None;
+        let mut new_knots = Vec::with_capacity(self.knots.len());
+
+        for knot in &self.knots {
+            let new_knot = match previous_knot {
+                Some(prev) => knot.follow(prev),
+                None => knot.move_direction(direction),
+            };
+
+            previous_knot = Some(new_knot);
+            new_knots.push(new_knot);
+        }
+
+        Rope { knots: new_knots }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
@@ -50,52 +80,6 @@ enum Direction {
     Down,
     Left,
     Right,
-}
-
-impl Rope {
-    fn process_move(&self, direction: Direction) -> Self {
-        let start = self.move_start(direction);
-        let end = self.move_end(start);
-
-        Rope { start, end }
-    }
-
-    fn move_start(&self, direction: Direction) -> Position {
-        match direction {
-            Direction::Up => Position {
-                x: self.start.x,
-                y: self.start.y + 1,
-            },
-            Direction::Down => Position {
-                x: self.start.x,
-                y: self.start.y - 1,
-            },
-            Direction::Left => Position {
-                x: self.start.x - 1,
-                y: self.start.y,
-            },
-            Direction::Right => Position {
-                x: self.start.x + 1,
-                y: self.start.y,
-            },
-        }
-    }
-
-    fn move_end(&self, start: Position) -> Position {
-        if self.end.is_adjacent(start) {
-            return self.end;
-        }
-        if self.end.x != start.x && self.end.y == start.y {
-            return self.end.move_towards_horizontally(start);
-        }
-        if self.end.y != start.y && self.end.x == start.x {
-            return self.end.move_towards_vertically(start);
-        }
-
-        self.end
-            .move_towards_horizontally(start)
-            .move_towards_vertically(start)
-    }
 }
 
 impl Position {
@@ -130,6 +114,42 @@ impl Position {
                 y: self.y - 1,
             }
         }
+    }
+
+    fn move_direction(&self, direction: Direction) -> Position {
+        match direction {
+            Direction::Up => Position {
+                x: self.x,
+                y: self.y + 1,
+            },
+            Direction::Down => Position {
+                x: self.x,
+                y: self.y - 1,
+            },
+            Direction::Left => Position {
+                x: self.x - 1,
+                y: self.y,
+            },
+            Direction::Right => Position {
+                x: self.x + 1,
+                y: self.y,
+            },
+        }
+    }
+
+    fn follow(&self, start: Position) -> Position {
+        if self.is_adjacent(start) {
+            return *self;
+        }
+        if self.x != start.x && self.y == start.y {
+            return self.move_towards_horizontally(start);
+        }
+        if self.y != start.y && self.x == start.x {
+            return self.move_towards_vertically(start);
+        }
+
+        self.move_towards_horizontally(start)
+            .move_towards_vertically(start)
     }
 }
 
