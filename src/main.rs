@@ -3,12 +3,11 @@
 #![feature(array_windows)]
 
 mod day10;
+mod day11;
 mod day6;
 mod day7;
 mod day9;
 
 fn main() {
-    let result = crate::day10::solution::part1();
-
-    println!("{:?}", result);
+    crate::day11::solution::part1();
 }
