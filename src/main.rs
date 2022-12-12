@@ -2,10 +2,9 @@
 #![feature(let_chains)]
 #![feature(array_windows)]
 
-mod day6;
+mod day8;
+mod day9;
 
 fn main() {
-    let result = crate::day6::solution::part2();
-
-    println!("{:?}", result);
+    crate::day9::solution::part1();
 }
