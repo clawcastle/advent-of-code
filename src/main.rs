@@ -3,4 +3,9 @@
 #![feature(array_windows)]
 
 mod day12;
-fn main() {}
+mod day13;
+fn main() {
+    let result = crate::day13::solution::part2();
+
+    dbg!(result);
+}
