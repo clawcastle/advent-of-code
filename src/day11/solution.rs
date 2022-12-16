@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-pub fn part1() {
+pub fn part2() {
     let input = include_str!("input.txt");
 
     let mut monkeys = input
@@ -8,6 +8,24 @@ pub fn part1() {
         .enumerate()
         .filter_map(|id_and_section| Monkey::try_from(id_and_section).ok())
         .collect_vec();
+
+    let divisor_product = monkeys
+        .iter()
+        .map(|monkey| monkey.test.divisble_by)
+        .product::<i64>();
+
+    // monkeys = monkeys
+    //     .iter()
+    //     .map(|monkey| {
+    //         let items = monkey
+    //             .items
+    //             .iter()
+    //             .map(|item| item % divisor_product)
+    //             .collect_vec();
+
+    //         Monkey { items, ..*monkey }
+    //     })
+    //     .collect_vec();
 
     println!("{:?}", monkeys);
 
@@ -17,7 +35,7 @@ pub fn part1() {
     for _ in 0..n_rounds {
         for id in 0..round_length {
             if let Some(monkey) = monkeys.iter_mut().find(|m| m.id == id) {
-                let updates = &monkey.take_turn();
+                let updates = &monkey.take_turn(divisor_product);
 
                 for update in updates {
                     if let Some(monkey2) = monkeys.iter_mut().find(|m| m.id == update.throw_to) {
@@ -226,13 +244,16 @@ struct MonkeyItemUpdate {
 }
 
 impl Monkey {
-    fn take_turn(&mut self) -> Vec<MonkeyItemUpdate> {
+    fn take_turn(&mut self, divisor_product: i64) -> Vec<MonkeyItemUpdate> {
         let mut updates: Vec<MonkeyItemUpdate> = Vec::with_capacity(self.items.len());
 
         while let Some(item) = self.items.pop() {
+            let item = item % divisor_product;
             let updated_worry_level = match self.operation.arguments {
-                OperationArgument::OldAndOther(other) => self.operation.compute(item, other) / 3,
-                OperationArgument::OldAndOld => self.operation.compute(item, item) / 3,
+                OperationArgument::OldAndOther(other) => {
+                    self.operation.compute(item, other % divisor_product)
+                }
+                OperationArgument::OldAndOld => self.operation.compute(item, item),
             };
             let throw_to = self.test.throw_to(updated_worry_level);
 
