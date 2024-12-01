@@ -1,11 +1,21 @@
 // https://adventofcode.com/2024/day/1
 
+use std::collections::HashMap;
+
 use iter_tools::Itertools;
 
 pub fn part1() -> () {
     let input = parse_input();
 
     let result = input.total_distance();
+
+    println!("Day 1 part 1 solution: {}", result);
+}
+
+pub fn part2() -> () {
+    let input = parse_input();
+
+    let result = input.total_similarity_score();
 
     println!("Day 1 part 1 solution: {}", result);
 }
@@ -35,5 +45,15 @@ struct Input {
 impl Input {
     fn total_distance(&self) -> i32 {
         self.left.iter().zip(&self.right).map(|(a,b)| (a - b).abs()).sum()
+    }
+
+    fn total_similarity_score(&self) -> i32 {
+        let mut occurences: HashMap<&i32, i32> = HashMap::new();
+
+        self.right.iter().for_each(|n| {
+            *occurences.entry(n).or_insert(0) += 1;
+        });
+
+        self.left.iter().map(|n| n * occurences.get(n).unwrap_or(&0)).sum()
     }
 }
