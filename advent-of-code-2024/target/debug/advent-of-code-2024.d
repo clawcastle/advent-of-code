@@ -1,1 +1,0 @@
-/home/clawcastle/repos/advent-of-code/advent-of-code-2024/target/debug/advent-of-code-2024: /home/clawcastle/repos/advent-of-code/advent-of-code-2024/src/day1.rs /home/clawcastle/repos/advent-of-code/advent-of-code-2024/src/main.rs
